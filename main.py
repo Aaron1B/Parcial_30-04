@@ -19,10 +19,11 @@ def main():
         books = [
             Book("1984", "George Orwell", BookGenre.FICTION),
             Book("To Kill a Mockingbird", "Harper Lee", BookGenre.FICTION),
-            Book("The Great Gatsby", "F. Scott Fitzgerald", BookGenre.FICTION),
             Book("A Brief History of Time", "Stephen Hawking", BookGenre.NONFICTION),
             Book("The Art of War", "Sun Tzu", BookGenre.NONFICTION),
-            Book("Pride and Prejudice", "Jane Austen", BookGenre.FICTION)
+            Book("Pride and Prejudice", "Jane Austen", BookGenre.FICTION),
+            Book("Cosmos", "Carl Sagan", BookGenre.SCIENCE),  
+            Book("The Story of Art", "E.H. Gombrich", BookGenre.ART)  
         ]
         users = [User("Alice"), User("Paco")]
 
