@@ -10,7 +10,7 @@ import os
 def main():
     root = tk.Tk()
     root.title("Gestión de Biblioteca")
-    root.geometry("800x400")  # Set the window size to 800x400
+    root.geometry("800x400")  
 
     if os.path.exists("library_state.pkl"):
         with open("library_state.pkl", "rb") as f:
@@ -24,7 +24,7 @@ def main():
             Book("The Art of War", "Sun Tzu", BookGenre.NONFICTION),
             Book("Pride and Prejudice", "Jane Austen", BookGenre.FICTION)
         ]
-        users = [User("Alice")]
+        users = [User("Alice"), User("Paco")]
 
     employee1 = Employee("Bob")
 
@@ -68,7 +68,7 @@ def main():
         books_listbox.delete(0, tk.END)
         for book in books:
             availability = "Disponible" if book.is_available() else "No Disponible"
-            books_listbox.insert(tk.END, f"{book.get_title()} ({availability})")
+            books_listbox.insert(tk.END, f"{book.get_title()} (*{book.get_genre().name}*) ({availability})")
 
     def update_users():
         users_listbox.delete(0, tk.END)
