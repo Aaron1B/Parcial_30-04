@@ -57,12 +57,26 @@ def main():
         elif not book:
             messagebox.showerror("Error", "Seleccione un libro válido.")
 
+    def add_book():
+        title = simpledialog.askstring("Nuevo Libro", "Ingrese el título del libro:")
+        author = simpledialog.askstring("Nuevo Libro", "Ingrese el autor del libro:")
+        genre = simpledialog.askstring("Nuevo Libro", "Ingrese el género del libro (FICTION/NONFICTION/SCIENCE/ART):")
+        try:
+            book = Book(title, author, BookGenre[genre.upper()])
+            books.append(book)
+            update_status()
+            save_library_state() 
+            messagebox.showinfo("Nuevo Libro", f"Libro '{title}' agregado exitosamente.")
+        except KeyError:
+            messagebox.showerror("Error", "Género inválido. Use FICTION, NONFICTION, SCIENCE o ART.")
+
     def add_user():
         name = simpledialog.askstring("Nuevo Usuario", "Ingrese el nombre del usuario:")
         if name:
             user = User(name)
             users.append(user)
             update_users()
+            save_library_state()  
             messagebox.showinfo("Nuevo Usuario", f"Usuario '{name}' agregado exitosamente.")
 
     def update_status():
@@ -76,21 +90,12 @@ def main():
         for user in users:
             users_listbox.insert(tk.END, user.name)
 
-    def add_book():
-        title = simpledialog.askstring("Nuevo Libro", "Ingrese el título del libro:")
-        author = simpledialog.askstring("Nuevo Libro", "Ingrese el autor del libro:")
-        genre = simpledialog.askstring("Nuevo Libro", "Ingrese el género del libro (FICTION/NONFICTION):")
-        try:
-            book = Book(title, author, BookGenre[genre.upper()])
-            books.append(book)
-            update_status()
-            messagebox.showinfo("Nuevo Libro", f"Libro '{title}' agregado exitosamente.")
-        except KeyError:
-            messagebox.showerror("Error", "Género inválido. Use FICTION o NONFICTION.")
-
-    def save_and_exit():
+    def save_library_state():
         with open("library_state.pkl", "wb") as f:
             pickle.dump((books, users), f)
+
+    def save_and_exit():
+        save_library_state()
         root.destroy()
 
     status_label = tk.Label(root, text="Selecciona un libro y un usuario para interactuar:")
@@ -102,7 +107,7 @@ def main():
     books_label = tk.Label(books_frame, text="Libros:")
     books_label.pack()
 
-    books_listbox = tk.Listbox(books_frame, height=10, width=50)  # Adjust width for better visibility
+    books_listbox = tk.Listbox(books_frame, height=10, width=50)  
     books_listbox.pack()
     update_status()
 
@@ -112,7 +117,7 @@ def main():
     users_label = tk.Label(users_frame, text="Usuarios:")
     users_label.pack()
 
-    users_listbox = tk.Listbox(users_frame, height=10, width=30)  # Adjust width for user list
+    users_listbox = tk.Listbox(users_frame, height=10, width=30)  
     users_listbox.pack()
     update_users()
 
