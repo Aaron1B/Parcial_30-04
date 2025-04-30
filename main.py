@@ -10,6 +10,7 @@ import os
 def main():
     root = tk.Tk()
     root.title("Gestión de Biblioteca")
+    root.geometry("800x400")  # Set the window size to 800x400
 
     if os.path.exists("library_state.pkl"):
         with open("library_state.pkl", "rb") as f:
@@ -29,29 +30,50 @@ def main():
 
     def borrow_book():
         selected_book = books_listbox.get(tk.ACTIVE)
+        selected_user = users_listbox.get(tk.ACTIVE)
         book = next((b for b in books if b.get_title() in selected_book), None)
-        if book:
-            user_name = simpledialog.askstring("Préstamo", "Ingrese el nombre del usuario:")
-            user = next((u for u in users if u.name == user_name), None)
-            if user:
-                message = user.borrow_book(book)
-                update_status()
-                messagebox.showinfo("Préstamo", message)
-            else:
-                messagebox.showerror("Error", f"Usuario '{user_name}' no encontrado.")
+        user = next((u for u in users if u.name == selected_user), None)
+        if book and user:
+            message = user.borrow_book(book)
+            update_status()
+            messagebox.showinfo("Préstamo", message)
+        elif not user:
+            messagebox.showerror("Error", "Seleccione un usuario válido.")
+        elif not book:
+            messagebox.showerror("Error", "Seleccione un libro válido.")
 
     def return_book():
         selected_book = books_listbox.get(tk.ACTIVE)
+        selected_user = users_listbox.get(tk.ACTIVE)
         book = next((b for b in books if b.get_title() in selected_book), None)
-        if book:
-            user_name = simpledialog.askstring("Devolución", "Ingrese el nombre del usuario:")
-            user = next((u for u in users if u.name == user_name), None)
-            if user:
-                message = user.return_book(book)
-                update_status()
-                messagebox.showinfo("Devolución", message)
-            else:
-                messagebox.showerror("Error", f"Usuario '{user_name}' no encontrado.")
+        user = next((u for u in users if u.name == selected_user), None)
+        if book and user:
+            message = user.return_book(book)
+            update_status()
+            messagebox.showinfo("Devolución", message)
+        elif not user:
+            messagebox.showerror("Error", "Seleccione un usuario válido.")
+        elif not book:
+            messagebox.showerror("Error", "Seleccione un libro válido.")
+
+    def add_user():
+        name = simpledialog.askstring("Nuevo Usuario", "Ingrese el nombre del usuario:")
+        if name:
+            user = User(name)
+            users.append(user)
+            update_users()
+            messagebox.showinfo("Nuevo Usuario", f"Usuario '{name}' agregado exitosamente.")
+
+    def update_status():
+        books_listbox.delete(0, tk.END)
+        for book in books:
+            availability = "Disponible" if book.is_available() else "No Disponible"
+            books_listbox.insert(tk.END, f"{book.get_title()} ({availability})")
+
+    def update_users():
+        users_listbox.delete(0, tk.END)
+        for user in users:
+            users_listbox.insert(tk.END, user.name)
 
     def add_book():
         title = simpledialog.askstring("Nuevo Libro", "Ingrese el título del libro:")
@@ -65,30 +87,33 @@ def main():
         except KeyError:
             messagebox.showerror("Error", "Género inválido. Use FICTION o NONFICTION.")
 
-    def add_user():
-        name = simpledialog.askstring("Nuevo Usuario", "Ingrese el nombre del usuario:")
-        if name:
-            user = User(name)
-            users.append(user)
-            messagebox.showinfo("Nuevo Usuario", f"Usuario '{name}' agregado exitosamente.")
-
-    def update_status():
-        books_listbox.delete(0, tk.END)
-        for book in books:
-            availability = "Disponible" if book.is_available() else "No Disponible"
-            books_listbox.insert(tk.END, f"{book.get_title()} ({availability})")
-
     def save_and_exit():
         with open("library_state.pkl", "wb") as f:
             pickle.dump((books, users), f)
         root.destroy()
 
-    status_label = tk.Label(root, text="Selecciona un libro para interactuar:")
+    status_label = tk.Label(root, text="Selecciona un libro y un usuario para interactuar:")
     status_label.pack(pady=10)
 
-    books_listbox = tk.Listbox(root, height=10)
-    books_listbox.pack(pady=10)
+    books_frame = tk.Frame(root)
+    books_frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+    books_label = tk.Label(books_frame, text="Libros:")
+    books_label.pack()
+
+    books_listbox = tk.Listbox(books_frame, height=10, width=50)  # Adjust width for better visibility
+    books_listbox.pack()
     update_status()
+
+    users_frame = tk.Frame(root)
+    users_frame.pack(side=tk.RIGHT, padx=10, pady=10)
+
+    users_label = tk.Label(users_frame, text="Usuarios:")
+    users_label.pack()
+
+    users_listbox = tk.Listbox(users_frame, height=10, width=30)  # Adjust width for user list
+    users_listbox.pack()
+    update_users()
 
     borrow_button = tk.Button(root, text="Prestar Libro", command=borrow_book)
     borrow_button.pack(pady=5)
